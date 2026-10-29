@@ -272,7 +272,7 @@ class AnalyzeViewModel(
                 selectedFaceIndex = faceIndex,
                 search = outcome,
                 matches = resolveMatches(outcome),
-                verdict = outcome.report.verdict,
+                verdict = outcome.verdict,
             )
         }
     }

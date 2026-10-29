@@ -46,10 +46,12 @@ class FacePipeline:
         h, w = rgb.shape[:2]
         cx, cy = det.x + det.w / 2.0, det.y + det.h / 2.0
         half = max(det.w, det.h) * 0.75
-        x0 = int(max(0, cx - half))
-        y0 = int(max(0, cy - half))
-        x1 = int(min(w, cx + half))
-        y1 = int(min(h, cy + half))
+        # Rounding must match the Kotlin port (roundToInt), otherwise the crop
+        # shifts by a pixel and the refined landmarks diverge.
+        x0 = int(max(0, round(cx - half)))
+        y0 = int(max(0, round(cy - half)))
+        x1 = int(min(w, round(cx + half)))
+        y1 = int(min(h, round(cy + half)))
         cw, ch = x1 - x0, y1 - y0
         if cw < 16 or ch < 16:
             return det
@@ -57,7 +59,7 @@ class FacePipeline:
         scale = min(640.0 / max(cw, ch), REFINE_MAX_SCALE)
         if scale <= 1.05:
             return det
-        up = resize_bilinear(sub, int(round(cw * scale)), int(round(ch * scale)))
+        up = resize_bilinear(sub, max(1, int(round(cw * scale))), max(1, int(round(ch * scale))))
         # run the raw detector on the upscaled crop (never upscaling again)
         canvas, ls, lpx, lpy = letterbox(up, 640, allow_upscale=False)
         blob = np.transpose(canvas[..., ::-1].astype(np.float32), (2, 0, 1))[None].copy()
