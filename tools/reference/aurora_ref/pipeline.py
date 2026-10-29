@@ -92,6 +92,9 @@ class FacePipeline:
                     d = self.refine_landmarks(rgb, d)
                 out.append(d)
             dets = out
+        # Face order must be deterministic and match the Android port:
+        # largest face first, then by position.
+        dets = sorted(dets, key=lambda d: (-(d.w * d.h), round(d.x, 3), round(d.y, 3)))
         return dets
 
     def process(self, rgb: np.ndarray) -> List[FaceResult]:

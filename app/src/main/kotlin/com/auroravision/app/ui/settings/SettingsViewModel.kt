@@ -47,12 +47,12 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
         viewModelScope.launch {
             val loaded = withContext(Dispatchers.IO) { readCalibration(container) }
             _state.value = _state.value.copy(
-                measuredAuc = loaded?.first,
-                measuredEer = loaded?.second,
-                measuredFar = loaded?.third,
-                dataset = loaded?.fourth ?: "",
-                calibrationGeneratedAt = loaded?.fifth ?: "",
-                sampleCount = loaded?.sixth ?: 0,
+                measuredAuc = loaded?.auc,
+                measuredEer = loaded?.eer,
+                measuredFar = loaded?.far,
+                dataset = loaded?.dataset ?: "",
+                calibrationGeneratedAt = loaded?.generatedAt ?: "",
+                sampleCount = loaded?.samples ?: 0,
             )
         }
     }

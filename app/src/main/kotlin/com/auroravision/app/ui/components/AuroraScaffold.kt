@@ -25,9 +25,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -196,14 +198,12 @@ fun ScanningOverlay(modifier: Modifier = Modifier, color: Color = AuroraColors.C
     )
     Canvas(modifier) {
         val y = size.height * progress
+        val bandHeight = 60.dp.toPx()
+        val top = (y - bandHeight / 2f).coerceIn(0f, (size.height - bandHeight).coerceAtLeast(0f))
         drawRect(
-            brush = Brush.verticalGradient(
-                colors = listOf(Color.Transparent, color.copy(alpha = 0.22f), Color.Transparent),
-                startY = y - 40.dp.toPx(),
-                endY = y + 40.dp.toPx(),
-            ),
-            topLeft = Offset(0f, (y - 40.dp.toPx()).coerceAtLeast(0f)),
-            size = androidx.compose.ui.geometry.Size(size.width, 80.dp.toPx().coerceAtMost(size.height)),
+            color = color.copy(alpha = 0.07f),
+            topLeft = Offset(0f, top),
+            size = Size(size.width, bandHeight),
         )
         drawLine(
             color = color.copy(alpha = 0.8f),

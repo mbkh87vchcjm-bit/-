@@ -240,7 +240,7 @@ class AnalyzeViewModel(
             selectedFaceIndex = outcome.selectedFaceIndex,
             search = outcome.search,
             matches = matches,
-            verdict = outcome.verdict,
+            verdict = outcome.report.verdict,
             timings = outcome.report.timings,
             sessionId = sessionId,
             detail = outcome.report.failureReason,
@@ -272,7 +272,7 @@ class AnalyzeViewModel(
                 selectedFaceIndex = faceIndex,
                 search = outcome,
                 matches = resolveMatches(outcome),
-                verdict = outcome.verdict,
+                verdict = outcome.report.verdict,
             )
         }
     }
