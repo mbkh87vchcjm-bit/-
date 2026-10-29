@@ -63,6 +63,26 @@ jobs:
         if: always()
         run: ./gradlew --no-daemon :app:assembleRelease --stacktrace
 
+      # Proves the APK actually contains the engine, the calibrations and the
+      # native runtime — i.e. that the build is not merely "compiling".
+      - name: Verify APK contents
+        run: |
+          set -e
+          for apk in app/build/outputs/apk/debug/*.apk app/build/outputs/apk/release/*.apk; do
+            echo "== $apk ($(stat -c%s "$apk") bytes, sha256 $(sha256sum "$apk" | cut -d" " -f1))"
+            unzip -l "$apk" > listing.txt
+            for required in \
+              assets/models/face_detection_yunet_2023mar.onnx \
+              assets/models/face_recognition_sface_2021dec_int8.onnx \
+              assets/calibration/match_policy.json \
+              assets/calibration/quality_policy.json \
+              assets/calibration/calibration_report.json \
+              lib/arm64-v8a/libonnxruntime.so ; do
+              grep -q "$required" listing.txt || { echo "MISSING in APK: $required"; exit 1; }
+            done
+            echo "all required assets present"
+          done
+
       - name: Lint
         run: ./gradlew --no-daemon :app:lintDebug --stacktrace
         continue-on-error: true
