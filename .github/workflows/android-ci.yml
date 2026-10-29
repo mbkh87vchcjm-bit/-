@@ -50,14 +50,17 @@ jobs:
           ./gradlew --no-daemon :core:test --stacktrace 2>&1 | tee build.log
 
       - name: Run app unit tests
+        if: always()
         run: |
           set -o pipefail
           ./gradlew --no-daemon :app:testDebugUnitTest --stacktrace 2>&1 | tee -a build.log
 
       - name: Assemble debug APK
+        if: always()
         run: ./gradlew --no-daemon :app:assembleDebug --stacktrace
 
       - name: Assemble release APK (unsigned)
+        if: always()
         run: ./gradlew --no-daemon :app:assembleRelease --stacktrace
 
       - name: Lint
