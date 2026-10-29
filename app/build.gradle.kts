@@ -6,6 +6,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+ksp {
+    // Room exports its schema so migrations can be reviewed in code review.
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 android {
     namespace = "com.auroravision.app"
     compileSdk = 35
