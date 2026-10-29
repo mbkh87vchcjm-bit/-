@@ -1,0 +1,61 @@
+{
+ "samples": {
+  "lfwClean": 149,
+  "sceneClean": 8,
+  "perDegradation": {
+   "blur_sigma5": 21,
+   "dark_15pct": 139,
+   "rotated_45deg": 18,
+   "occluded_40pct": 156
+  }
+ },
+ "distributions": {
+  "cleanSharpnessP01": 183.22,
+  "cleanSharpnessP05": 215.66,
+  "cleanSharpnessMin": 176.17,
+  "sceneBlurSigma5SharpnessP50": 4.71,
+  "sceneBlurSigma5SharpnessP95": 308.87,
+  "cleanBrightnessP01": 26.47,
+  "dark15BrightnessP95": 16.34,
+  "cleanContrastP01": 38.5
+ },
+ "policy": {
+  "minFacePx": 48.0,
+  "minFaceRatio": 0.02,
+  "minSharpness": 29.36,
+  "minBrightness": 21.2,
+  "maxBrightness": 228.0,
+  "minContrast": 17.3,
+  "maxAbsYaw": 0.35,
+  "maxAbsRollDeg": 30.0
+ },
+ "evaluation": {
+  "cleanRejectionRate": 0.0127,
+  "perDegradation": {
+   "blur_sigma5": {
+    "detected": 21,
+    "rejectionRate": 0.3333,
+    "sharpnessMedian": 219.64,
+    "brightnessMedian": 74.45
+   },
+   "dark_15pct": {
+    "detected": 139,
+    "rejectionRate": 1.0,
+    "sharpnessMedian": 11.16,
+    "brightnessMedian": 8.23
+   },
+   "rotated_45deg": {
+    "detected": 18,
+    "rejectionRate": 0.0,
+    "sharpnessMedian": 475.12,
+    "brightnessMedian": 75.26
+   },
+   "occluded_40pct": {
+    "detected": 156,
+    "rejectionRate": 0.0192,
+    "sharpnessMedian": 566.38,
+    "brightnessMedian": 43.8
+   }
+  }
+ }
+}

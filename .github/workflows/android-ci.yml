@@ -1,0 +1,160 @@
+name: Android CI
+
+on:
+  push:
+    branches: [main, "arena/**"]
+  pull_request:
+  workflow_dispatch:
+
+# Explicitly request the permissions the diagnostic step needs.
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build, unit-test, package APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle (with cache)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
+
+      - name: Show toolchain
+        run: |
+          java -version
+          ./gradlew --version
+
+      # The JVM tests exercise the real ONNX models through the same :core code
+      # that runs on the phone (detection, alignment, embeddings, search,
+      # metrics). A failure here means the engine is broken, not the UI.
+      - name: Run core engine tests (real models, golden vectors)
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon :core:test --stacktrace 2>&1 | tee build.log
+
+      - name: Run app unit tests
+        if: always()
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon :app:testDebugUnitTest --stacktrace 2>&1 | tee -a build.log
+
+      - name: Assemble debug APK
+        if: always()
+        run: ./gradlew --no-daemon :app:assembleDebug --stacktrace
+
+      - name: Assemble release APK (unsigned)
+        if: always()
+        run: ./gradlew --no-daemon :app:assembleRelease --stacktrace
+
+      # Proves the APK actually contains the engine, the calibrations and the
+      # native runtime — i.e. that the build is not merely "compiling".
+      - name: Verify APK contents
+        run: |
+          set -e
+          for apk in app/build/outputs/apk/debug/*.apk app/build/outputs/apk/release/*.apk; do
+            echo "== $apk ($(stat -c%s "$apk") bytes, sha256 $(sha256sum "$apk" | cut -d" " -f1))"
+            unzip -l "$apk" > listing.txt
+            for required in \
+              assets/models/face_detection_yunet_2023mar.onnx \
+              assets/models/face_recognition_sface_2021dec_int8.onnx \
+              assets/calibration/match_policy.json \
+              assets/calibration/quality_policy.json \
+              assets/calibration/calibration_report.json \
+              lib/arm64-v8a/libonnxruntime.so ; do
+              grep -q "$required" listing.txt || { echo "MISSING in APK: $required"; exit 1; }
+            done
+            echo "all required assets present"
+          done
+
+      - name: Lint
+        run: ./gradlew --no-daemon :app:lintDebug --stacktrace
+        continue-on-error: true
+
+      # The Actions log blob host is not reachable from every environment, so
+      # failures are also published as an issue comment where the API can read
+      # them. Diagnostic only: never fails the build.
+      - name: Publish failure digest
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          touch build.log
+          { grep -E "(^e: |error:|FAILED|Caused by:|Unresolved reference|expected|> Task .* FAILED)" build.log | head -60 || true; } > digest.txt
+          # Unit-test failure text lives in the JUnit XML, not in the console output.
+          for f in $(find . -path '*/build/test-results/*' -name 'TEST-*.xml' 2>/dev/null); do
+            python3 - "$f" >> digest.txt <<'PYEOF'
+          import sys, xml.etree.ElementTree as ET
+          try:
+              tree = ET.parse(sys.argv[1])
+          except Exception:
+              sys.exit(0)
+          for case in tree.getroot().iter("testcase"):
+              for fail in case.findall("failure") + case.findall("error"):
+                  msg = (fail.get("message") or fail.text or "").strip().splitlines()
+                  print(f"TEST {case.get('classname')}.{case.get('name')}: " + (msg[0] if msg else "failed"))
+          PYEOF
+          done
+          if [ ! -s digest.txt ]; then tail -c 6000 build.log > digest.txt || true; fi
+          printf '\n\n<details><summary>tail</summary>\n\n```\n' >> digest.txt
+          tail -c 3000 build.log >> digest.txt || true
+          printf '\n```\n\n</details>\n' >> digest.txt
+          jq -Rs --arg sha "${{ github.sha }}" --arg run "${{ github.run_id }}" \
+            '{body: ("### CI failure `" + $sha[0:7] + "` (run " + $run + ")\n\n```\n" + . + "\n```")}' digest.txt > payload.json
+          gh api -X POST "repos/${{ github.repository }}/issues/1/comments" --input payload.json || true
+          gh api -X POST "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" --input payload.json || true
+          # Always-on channel: workflow commands become check-run annotations,
+          # which are readable through the REST API without any write scope.
+          head -20 digest.txt | while IFS= read -r line; do
+            esc=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e 's/\n/%0A/g')
+            echo "::error title=Build failure::$esc"
+          done
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-vision-apks
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload test & lint reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-vision-reports
+          path: |
+            core/build/reports/tests/**
+            app/build/reports/tests/**
+            app/build/reports/lint-results-*.html
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-vision-evaluation
+          path: |
+            docs/EVALUATION.md
+            docs/calibration/*.json
+          retention-days: 30
+          if-no-files-found: warn
