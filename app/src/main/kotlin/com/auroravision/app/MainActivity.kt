@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelProvider
@@ -63,6 +62,7 @@ class MainActivity : ComponentActivity() {
                 AuroraNavHost(
                     container = container,
                     analyzeViewModel = analyzeViewModel,
+                    libraryViewModel = libraryViewModel,
                     navController = navController,
                     onPickImage = {
                         onPicked = { uris ->

@@ -48,8 +48,12 @@ class OnnxSession private constructor(
                     for (name in outputNames) {
                         val t = byName[name]
                             ?: throw IllegalStateException("model produced no tensor output named '$name'")
-                        val buffer = t.floatBuffer.orElse(null)
-                            ?: throw IllegalStateException("output '$name' is not a float tensor")
+                        // ONNX Runtime returns java.nio.FloatBuffer here (not Optional);
+                        // a null means the tensor is not a float tensor.
+                        val buffer = t.floatBuffer
+                        if (buffer == null) {
+                            throw IllegalStateException("output '$name' is not a float tensor")
+                        }
                         val arr = FloatArray(buffer.remaining())
                         buffer.get(arr)
                         out.add(TensorOutput(name, t.info.shape.clone(), arr))

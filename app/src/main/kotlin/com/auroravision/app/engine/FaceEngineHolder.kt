@@ -9,7 +9,6 @@ import com.auroravision.core.policy.ModelInfo
 import com.auroravision.core.policy.PolicyProvenance
 import com.auroravision.core.quality.QualityPolicy
 import kotlinx.serialization.json.Json
-import java.io.File
 import java.security.MessageDigest
 
 /** State of the on-device engine, surfaced on the home screen. */
@@ -36,17 +35,12 @@ class FaceEngineHolder(private val context: Context) {
     /** Number of CPU cores used for inference (2 keeps the phone responsive). */
     private val threads: Int = 2
 
-    fun loadQualityPolicy(): QualityPolicy {
-        val file = File(context.cacheDir, "")
-        return try {
-            val text = context.assets.open("calibration/quality_policy.json")
-                .bufferedReader().use { it.readText() }
-            Json { ignoreUnknownKeys = true }.decodeFromString<QualityPolicy>(text)
-        } catch (e: Exception) {
-            QualityPolicy()
-        } finally {
-            file.let { }
-        }
+    fun loadQualityPolicy(): QualityPolicy = try {
+        val text = context.assets.open("calibration/quality_policy.json")
+            .bufferedReader().use { it.readText() }
+        Json { ignoreUnknownKeys = true }.decodeFromString<QualityPolicy>(text)
+    } catch (e: Exception) {
+        QualityPolicy()
     }
 
     /**
@@ -70,10 +64,7 @@ class FaceEngineHolder(private val context: Context) {
     fun ensureLoaded(): EngineState {
         detectorSession?.let { det ->
             val emb = embedderSession
-            if (emb != null) {
-                verifyChecksums()
-                return EngineState.Ready(modelInfo)
-            }
+            if (emb != null) return EngineState.Ready(modelInfo)
         }
         return try {
             val detBytes = readAsset(modelInfo.detectorFile)
@@ -105,10 +96,6 @@ class FaceEngineHolder(private val context: Context) {
     fun requireEmbedder(): SFaceEmbedder {
         val session = embedderSession ?: error("engine not loaded (call ensureLoaded first)")
         return SFaceEmbedder(session)
-    }
-
-    private fun verifyChecksums() {
-        // Verified at load time; this is a no-op after a successful load.
     }
 
     private fun readAsset(name: String): ByteArray =

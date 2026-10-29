@@ -133,8 +133,12 @@ object VerificationMetrics {
         )
     }
 
-    fun mean(values: FloatArray): Float =
-        if (values.isEmpty()) 0f else (values.sumOf { it.toDouble() } / values.size).toFloat()
+    fun mean(values: FloatArray): Float {
+        if (values.isEmpty()) return 0f
+        var sum = 0.0
+        for (v in values) sum += v
+        return (sum / values.size).toFloat()
+    }
 
     /** Linear-interpolated percentile (same convention as NumPy's default). */
     fun percentile(values: FloatArray, p: Double): Float {

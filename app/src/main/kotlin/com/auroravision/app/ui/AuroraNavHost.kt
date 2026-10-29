@@ -39,6 +39,7 @@ object Routes {
 fun AuroraNavHost(
     container: AppContainer,
     analyzeViewModel: AnalyzeViewModel,
+    libraryViewModel: ImageLibraryViewModel,
     onPickImage: () -> Unit,
     onPickImagesForLibrary: () -> Unit,
     navController: NavHostController = rememberNavController(),
@@ -68,11 +69,8 @@ fun AuroraNavHost(
         }
 
         composable(Routes.LIBRARY) {
-            val vm: ImageLibraryViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                factory = ImageLibraryViewModel.factory(container),
-            )
             LibraryScreen(
-                viewModel = vm,
+                viewModel = libraryViewModel,
                 onPickImages = onPickImagesForLibrary,
                 onOpenCamera = { navController.navigate(Routes.CAMERA) },
                 onBack = { navController.popBackStack() },

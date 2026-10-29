@@ -78,8 +78,13 @@ class GoldenPipelineTest {
                     }
 
                     val expEmb = exp["embedding"]
-                    if (expEmb == null || expEmb.toString() == "null") {
-                        assertTrue("expected no embedding for $file face $i", det.let { true })
+                    if (expEmb == null || expEmb is kotlinx.serialization.json.JsonNull) {
+                        // reference found a face but produced no embedding: acceptable only
+                        // when the quality gate rejected it
+                        assertTrue(
+                            "no golden embedding for $file face $i, but the quality gate accepted it",
+                            (exp["quality"]!!.jsonObject["status"]!!.jsonPrimitive.content) == "rejected",
+                        )
                         return@forEachIndexed
                     }
                     val embedding = embedder.embed(image, det)
