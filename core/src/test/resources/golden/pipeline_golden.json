@@ -1781,9 +1781,9 @@
    "detections": [
     {
      "box": [
-      -8.979,
+      0.0,
       45.598,
-      125.023,
+      116.044,
       188.232
      ],
      "score": 0.9264,
@@ -1811,14 +1811,14 @@
      ],
      "quality": {
       "status": "ok",
-      "score": 0.8541,
+      "score": 0.8447,
       "sharpness": 1047.45,
       "brightness": 106.79,
       "contrast": 73.54,
       "yawProxy": 0.1016,
       "rollDeg": 2.06,
-      "faceShortSidePx": 125.02,
-      "faceRatio": 0.453
+      "faceShortSidePx": 116.04,
+      "faceRatio": 0.4204
      },
      "issueCodes": [],
      "embedding": [

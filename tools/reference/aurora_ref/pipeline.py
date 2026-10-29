@@ -82,7 +82,17 @@ class FacePipeline:
         by = (best.y - lpy) / scale + y0
         bw = best.w / scale
         bh = best.h / scale
-        return Detection(float(bx), float(by), float(bw), float(bh), float(best.score), lm)
+        # Clip to the image, exactly like the Kotlin port (a refined face near the
+        # border can otherwise produce a box with negative coordinates).
+        h_img, w_img = rgb.shape[:2]
+        x1 = max(0.0, bx)
+        y1 = max(0.0, by)
+        x2 = min(float(w_img), bx + bw)
+        y2 = min(float(h_img), by + bh)
+        if x2 - x1 < 4 or y2 - y1 < 4:
+            return det
+        return Detection(float(x1), float(y1), float(x2 - x1), float(y2 - y1),
+                         float(best.score), lm)
 
     # ------------------------------------------------------------------ #
     def detect(self, rgb: np.ndarray) -> List[Detection]:

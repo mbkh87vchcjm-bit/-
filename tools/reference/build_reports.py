@@ -97,11 +97,9 @@ def main() -> int:
         "operatingPoints": ops,
         "ablationRefinement": None if not ablation else {
             "enabled": {"eer": cal["test"]["eer"], "auc": cal["test"]["auc"],
-                        "frrAtTargetFar": op["testFrr"],
+                        "frrAtShippedThreshold": op["testFrr"],
                         "detectMedianMs": cal["timingMs"]["detectMedian"]},
             "disabled": {"eer": ablation["test"]["eer"], "auc": ablation["test"]["auc"],
-                         "frrAtTargetFar": next(
-                             (o["testFrr"] for o in ops if False), None),
                          "detectMedianMs": ablation["timingMs"]["detectMedian"]},
         },
         "qualityGate": quality,
@@ -179,10 +177,10 @@ def write_evaluation_md(cal, ablation, ops, quality, policy, op) -> None:
     A("|---|---|---|")
     A(f"| AUC | {t['auc']} | احتمال أن يتفوق زوج حقيقي على زوج مختلف |")
     A(f"| EER | {t['eer']} | عند العتبة {t['eerThreshold']} |")
-    A(f"| FAR | {t['far']} | نسبة قبول زوج مختلف (خطأ) |")
-    A(f"| FRR | {t['frr']} | نسبة رفض زوج حقيقي (خطأ) |")
-    A(f"| TAR | {t['tar']} | معدل القبول الصحيح |")
-    A(f"| الدقة | {t['accuracy']} | متوسط (1-FAR) و (1-FRR) |")
+    A(f"| FAR | {op['testFar']} | نسبة قبول زوج مختلف (خطأ) عند العتبة المشحونة |")
+    A(f"| FRR | {op['testFrr']} | نسبة رفض زوج حقيقي (خطأ) عند العتبة المشحونة |")
+    A(f"| TAR | {round(1 - op['testFrr'], 5)} | معدل القبول الصحيح |")
+    A(f"| الدقة | {op['testAcc']} | متوسط (1-FAR) و (1-FRR) |")
     A("")
     A(f"- متوسط تشابه الأزواج الحقيقية: **{t['sameMean']}** (المئين 5: {t['sameP05']})")
     A(f"- متوسط تشابه الأزواج المختلفة: **{t['diffMean']}** "
@@ -192,7 +190,7 @@ def write_evaluation_md(cal, ablation, ops, quality, policy, op) -> None:
     A("")
     A("| العتبة | FAR | FRR | الدقة |")
     A("|---|---|---|---|")
-    A(f"| {policy['operatingThreshold']} (مُعايرة) | {t['far']} | {t['frr']} | {t['accuracy']} |")
+    A(f"| {policy['operatingThreshold']} (مُعايرة) | {op['testFar']} | {op['testFrr']} | {op['testAcc']} |")
     A(f"| 0.363 (Zoo) | {zoo['far']} | {zoo['frr']} | {zoo['accuracy']} |")
     A("")
     A("## 4. أثر محاذاة الوجوه الصغيرة | Ablation: landmark refinement")

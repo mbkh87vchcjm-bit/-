@@ -138,13 +138,12 @@
     "enabled": {
       "eer": 0.018445,
       "auc": 0.998208,
-      "frrAtTargetFar": 0.03436,
+      "frrAtShippedThreshold": 0.03436,
       "detectMedianMs": 21.86
     },
     "disabled": {
       "eer": 0.0268,
       "auc": 0.996742,
-      "frrAtTargetFar": null,
       "detectMedianMs": 9.75
     }
   },
