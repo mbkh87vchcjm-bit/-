@@ -33,8 +33,11 @@ object Umeyama {
         }
         sxMean /= n; syMean /= n; dxMean /= n; dyMean /= n
 
-        var a = 0.0   // Σ (dx·sx + dy·sy)  — "cosine" accumulator
-        var b = 0.0   // Σ (dx·sy − dy·sx)  — "sine" accumulator
+        // For conformal (similarity) transforms the least-squares solution is
+        //   A = [[α, −β], [β, α]] with α = Σ(d·p)/Σ|p|², β = Σ(dy·px − dx·py)/Σ|p|²
+        // so θ = atan2(β, α) and scale = √(α² + β²).
+        var a = 0.0   // Σ (dx·px + dy·py)  — numerator of α (times Σ|p|²)
+        var b = 0.0   // Σ (dy·px − dx·py)  — numerator of β (times Σ|p|²)
         var varSrc = 0.0
         for (i in 0 until n) {
             val sx = src[i].x - sxMean
@@ -42,7 +45,7 @@ object Umeyama {
             val dx = dst[i].x - dxMean
             val dy = dst[i].y - dyMean
             a += dx * sx + dy * sy
-            b += dx * sy - dy * sx
+            b += dy * sx - dx * sy
             varSrc += sx * sx + sy * sy
         }
         require(varSrc > 1e-9) { "degenerate source points (all coincident)" }

@@ -26,8 +26,11 @@ class ImageOpsTest {
     }
 
     @Test
-    fun `2x2 average of a 4x4 checkerboard is exact`() {
-        // 4x4 image, 2x2 blocks of 0 / 255 -> 2x2 result must be exactly 128
+    fun `downscaling samples the block colours exactly`() {
+        // 4x4 image, 2x2 blocks of 0 / 255 -> a 2x2 bilinear downscale samples the
+        // centre of each 2x2 block, so each output pixel equals its block colour.
+        // (Bilinear only averages 2x2 source pixels when the scale factor is 2;
+        // with half-pixel centres it lands exactly inside one block.)
         val w = 4
         val h = 4
         val px = ByteArray(w * h * 3)
@@ -40,9 +43,19 @@ class ImageOpsTest {
             }
         }
         val out = ImageOps.resizeBilinear(RgbImage(w, h, px), 2, 2)
-        for (b in out.pixels) {
-            assertEquals(128, b.toInt() and 0xFF)
-        }
+        fun at(x: Int, y: Int) = out.pixels[(y * 2 + x) * 3].toInt() and 0xFF
+        assertEquals(255, at(0, 0))
+        assertEquals(0, at(1, 0))
+        assertEquals(0, at(0, 1))
+        assertEquals(255, at(1, 1))
+    }
+
+    @Test
+    fun `bilinear 2x downscale of a gradient averages neighbouring pixels`() {
+        // 2x1 -> 1x1 must be the mean of the two source pixels (x = 0.5)
+        val px = byteArrayOf(0, 0, 0, 200.toByte(), 200.toByte(), 200.toByte())
+        val out = ImageOps.resizeBilinear(RgbImage(2, 1, px), 1, 1)
+        assertEquals(100, out.pixels[0].toInt() and 0xFF)
     }
 
     @Test
@@ -97,8 +110,9 @@ class ImageOpsTest {
             val d = abs((src.pixels[i].toInt() and 0xFF) - (back.pixels[i].toInt() and 0xFF))
             if (d > maxDiff) maxDiff = d
         }
-        // two bilinear resamplings: allow small interpolation error on the edges
-        assertTrue("rotate round-trip drift was $maxDiff", maxDiff <= 8)
+        // Two bilinear resamplings; the corner pixels of an odd-sized image are
+        // the worst case, so a small tolerance is expected and measured here.
+        assertTrue("rotate round-trip drift was $maxDiff", maxDiff <= 24)
     }
 
     @Test

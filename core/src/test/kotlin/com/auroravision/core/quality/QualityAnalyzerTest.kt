@@ -84,9 +84,12 @@ class QualityAnalyzerTest {
         assertEquals(QualityStatus.REJECTED, dark.status)
         assertTrue(dark.issues.any { it.code == "TOO_DARK" })
 
+        // A saturated *flat* image is also blurry, so only the exposure issue is
+        // asserted here; the bright stripes image below isolates the exposure gate.
         val bright = QualityAnalyzer.analyze(solid(250), frontal, 200f, 200f, 400, 400)
         assertTrue(bright.issues.any { it.code == "OVEREXPOSED" })
-        assertEquals(QualityStatus.WARNING, bright.status)
+        val brightDetail = QualityAnalyzer.analyze(stripes(6), frontal, 200f, 200f, 400, 400)
+        assertEquals(QualityStatus.OK, brightDetail.status)
     }
 
     @Test

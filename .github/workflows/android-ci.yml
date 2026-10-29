@@ -73,7 +73,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           touch build.log
-          { grep -E "(^e: |error:|FAILED|Caused by:|Unresolved reference|expected|> Task .* FAILED)" build.log | head -120 || true; } > digest.txt
+          { grep -E "(^e: |error:|FAILED|Caused by:|Unresolved reference|expected|> Task .* FAILED)" build.log | head -60 || true; } > digest.txt
+          # Unit-test failure text lives in the JUnit XML, not in the console output.
+          for f in $(find . -path '*/build/test-results/*' -name 'TEST-*.xml' 2>/dev/null); do
+            python3 - "$f" >> digest.txt <<'PYEOF'
+          import sys, xml.etree.ElementTree as ET
+          try:
+              tree = ET.parse(sys.argv[1])
+          except Exception:
+              sys.exit(0)
+          for case in tree.getroot().iter("testcase"):
+              for fail in case.findall("failure") + case.findall("error"):
+                  msg = (fail.get("message") or fail.text or "").strip().splitlines()
+                  print(f"TEST {case.get('classname')}.{case.get('name')}: " + (msg[0] if msg else "failed"))
+          PYEOF
+          done
           if [ ! -s digest.txt ]; then tail -c 6000 build.log > digest.txt || true; fi
           printf '\n\n<details><summary>tail</summary>\n\n```\n' >> digest.txt
           tail -c 3000 build.log >> digest.txt || true
