@@ -1,0 +1,218 @@
+{
+  "generatedAt": "2026-10-29T07:33:41Z",
+  "engine": {
+    "detector": "face_detection_yunet_2023mar.onnx",
+    "embedder": "face_recognition_sface_2021dec_int8.onnx",
+    "similarity": "cosine",
+    "refineLandmarks": true,
+    "letterbox": 640,
+    "letterboxUpscale": false
+  },
+  "dataset": {
+    "name": "LFWCrop (aligned 250x250 crops of Labeled Faces in the Wild)",
+    "source": "github.com/t0nypi/LFWCrop_dataset_pytorch (mirror of the LFW deep-funneled/crop release)",
+    "imagesLoaded": 13233,
+    "identities": 5749,
+    "imagesEmbedded": 8204,
+    "failures": [
+      "Abid_Hamid_Mahmud_Al-Tikriti_0002: no face detected",
+      "Bruce_Springsteen_0003: no face detected",
+      "Charles_Mathews_0002: no face detected",
+      "Claudia_Pechstein_0003: no face detected",
+      "Colin_Montgomerie_0004: no face detected",
+      "Darrell_Porter_0002: no face detected",
+      "Eric_Clapton_0001: no face detected",
+      "Farouk_al-Sharaa_0002: no face detected",
+      "Hermann_Maier_0002: no face detected",
+      "James_Kopp_0002: no face detected",
+      "James_Kopp_0004: no face detected",
+      "Jennifer_Capriati_0031: no face detected",
+      "Luis_Horna_0002: no face detected",
+      "Mahathir_Mohamad_0001: no face detected",
+      "Mahmoud_Abbas_0013: no face detected",
+      "Oprah_Winfrey_0001: no face detected",
+      "Pedro_Malan_0002: no face detected",
+      "Richard_Branson_0001: no face detected",
+      "Thomas_Birmingham_0002: no face detected",
+      "Tony_Curtis_0001: no face detected"
+    ],
+    "failureCount": 39,
+    "pairsSame": 3482,
+    "pairsDiff": 3482,
+    "splitDevFraction": 0.5
+  },
+  "threshold": 0.3265,
+  "test": {
+    "threshold": 0.405563,
+    "far": 0.00058,
+    "frr": 0.085911,
+    "tar": 0.914089,
+    "accuracy": 0.956755,
+    "auc": 0.998208,
+    "eer": 0.018445,
+    "eerThreshold": 0.269918,
+    "samePairs": 1746,
+    "diffPairs": 1724,
+    "sameMean": 0.5868,
+    "sameP05": 0.3559,
+    "diffMean": 0.0454,
+    "diffP95": 0.222,
+    "diffP99": 0.3033,
+    "targetFar": 0.001
+  },
+  "testAtZooThreshold": {
+    "threshold": 0.363,
+    "far": 0.00232,
+    "frr": 0.05441,
+    "tar": 0.94559,
+    "accuracy": 0.971635,
+    "auc": 0.998208,
+    "eer": 0.018445,
+    "eerThreshold": 0.269918,
+    "samePairs": 1746,
+    "diffPairs": 1724,
+    "sameMean": 0.5868,
+    "sameP05": 0.3559,
+    "diffMean": 0.0454,
+    "diffP95": 0.222,
+    "diffP99": 0.3033,
+    "targetFar": null
+  },
+  "operatingPoints": [
+    {
+      "targetFar": 0.1,
+      "threshold": 0.1825,
+      "devFar": 0.09959,
+      "devFrr": 0.00702,
+      "testFar": 0.10789,
+      "testFrr": 0.00401,
+      "testAcc": 0.94405
+    },
+    {
+      "targetFar": 0.03,
+      "threshold": 0.2431,
+      "devFar": 0.0297,
+      "devFrr": 0.01463,
+      "testFar": 0.03248,
+      "testFrr": 0.01088,
+      "testAcc": 0.97832
+    },
+    {
+      "targetFar": 0.01,
+      "threshold": 0.2965,
+      "devFar": 0.0099,
+      "devFrr": 0.02458,
+      "testFar": 0.01218,
+      "testFrr": 0.02234,
+      "testAcc": 0.98274
+    },
+    {
+      "targetFar": 0.003,
+      "threshold": 0.3265,
+      "devFar": 0.00291,
+      "devFrr": 0.03628,
+      "testFar": 0.00522,
+      "testFrr": 0.03436,
+      "testAcc": 0.98021
+    },
+    {
+      "targetFar": 0.001,
+      "threshold": 0.4056,
+      "devFar": 0.00058,
+      "devFrr": 0.08894,
+      "testFar": 0.00058,
+      "testFrr": 0.08591,
+      "testAcc": 0.95676
+    },
+    {
+      "targetFar": 0.0001,
+      "threshold": 0.4744,
+      "devFar": 0.0,
+      "devFrr": 0.18841,
+      "testFar": 0.0,
+      "testFrr": 0.17354,
+      "testAcc": 0.91323
+    }
+  ],
+  "ablationRefinement": {
+    "enabled": {
+      "eer": 0.018445,
+      "auc": 0.998208,
+      "frrAtTargetFar": 0.03436,
+      "detectMedianMs": 21.86
+    },
+    "disabled": {
+      "eer": 0.0268,
+      "auc": 0.996742,
+      "frrAtTargetFar": null,
+      "detectMedianMs": 9.75
+    }
+  },
+  "qualityGate": {
+    "samples": {
+      "lfwClean": 149,
+      "sceneClean": 8,
+      "perDegradation": {
+        "blur_sigma5": 21,
+        "dark_15pct": 139,
+        "rotated_45deg": 18,
+        "occluded_40pct": 156
+      }
+    },
+    "distributions": {
+      "cleanSharpnessP01": 183.22,
+      "cleanSharpnessP05": 215.66,
+      "cleanSharpnessMin": 176.17,
+      "sceneBlurSigma5SharpnessP50": 4.71,
+      "sceneBlurSigma5SharpnessP95": 308.87,
+      "cleanBrightnessP01": 26.47,
+      "dark15BrightnessP95": 16.34,
+      "cleanContrastP01": 38.5
+    },
+    "policy": {
+      "minFacePx": 48.0,
+      "minFaceRatio": 0.02,
+      "minSharpness": 29.36,
+      "minBrightness": 21.2,
+      "maxBrightness": 228.0,
+      "minContrast": 17.3,
+      "maxAbsYaw": 0.35,
+      "maxAbsRollDeg": 30.0
+    },
+    "evaluation": {
+      "cleanRejectionRate": 0.0127,
+      "perDegradation": {
+        "blur_sigma5": {
+          "detected": 21,
+          "rejectionRate": 0.3333,
+          "sharpnessMedian": 219.64,
+          "brightnessMedian": 74.45
+        },
+        "dark_15pct": {
+          "detected": 139,
+          "rejectionRate": 1.0,
+          "sharpnessMedian": 11.16,
+          "brightnessMedian": 8.23
+        },
+        "rotated_45deg": {
+          "detected": 18,
+          "rejectionRate": 0.0,
+          "sharpnessMedian": 475.12,
+          "brightnessMedian": 75.26
+        },
+        "occluded_40pct": {
+          "detected": 156,
+          "rejectionRate": 0.0192,
+          "sharpnessMedian": 566.38,
+          "brightnessMedian": 43.8
+        }
+      }
+    }
+  },
+  "limitations": [
+    "LFW is a well-known benchmark: its aligned crops are easier than real phone photos (good lighting, mostly frontal, no motion blur).",
+    "The threshold is calibrated on LFW pairs; a deployment on very different imagery should be re-calibrated with images from that domain.",
+    "The Laplacian sharpness gate reliably rejects severe blur on photographs but is not a dependable blur classifier for small faces, where alignment upscaling inflates the metric.",
+    "Timings in this report were measured on a desktop x86_64 CPU, not on a phone; the app measures its own timings on the device."
+  ]
+}

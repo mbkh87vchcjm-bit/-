@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "metric": "cosine",
+  "operatingThreshold": 0.3265,
+  "inconclusiveFloor": 0.2,
+  "targetFar": 0.003,
+  "defaultTopK": 5,
+  "maxTopK": 20,
+  "provenance": {
+    "dataset": "LFWCrop (aligned 250x250 crops of Labeled Faces in the Wild) \u2014 5749 identities, 8204 embedded faces",
+    "pairsSame": 1746,
+    "pairsDiff": 1724,
+    "calibratedAtUtc": "2026-10-29T07:33:41Z",
+    "measuredAuc": 0.998208,
+    "measuredEer": 0.018445,
+    "measuredFar": 0.00522,
+    "measuredFrr": 0.03436,
+    "notes": "Threshold chosen on the development split at the target FAR, then reported once on the held-out test split. Similarity is evidence for a candidate, never proof of identity."
+  }
+}

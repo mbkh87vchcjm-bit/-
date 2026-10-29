@@ -1,0 +1,10 @@
+{
+  "minFacePx": 48.0,
+  "minFaceRatio": 0.02,
+  "minSharpness": 29.36,
+  "minBrightness": 21.2,
+  "maxBrightness": 228.0,
+  "minContrast": 17.3,
+  "maxAbsYaw": 0.35,
+  "maxAbsRollDeg": 30.0
+}

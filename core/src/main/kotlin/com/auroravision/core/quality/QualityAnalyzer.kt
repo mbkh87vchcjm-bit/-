@@ -81,21 +81,42 @@ data class QualityPolicy(
  */
 object QualityAnalyzer {
 
-    /** Variance of the 4-neighbour Laplacian on the luma channel. */
-    fun laplacianVariance(gray: FloatArray, width: Int, height: Int): Float {
-        if (width < 3 || height < 3) return 0f
+    /**
+     * Variance of the 4-neighbour Laplacian on the luma channel, ignoring a
+     * border of [insetRatio] × the short side.
+     *
+     * The inset matters: the aligned crop is a warp with zero padding, so a face
+     * at the edge of the photo leaves an artificial black frame whose Laplacian
+     * response would make a *blurrier* image score as sharper (measured on the
+     * calibration set before the fix: 200-440 instead of ~5).
+     */
+    fun laplacianVariance(
+        gray: FloatArray,
+        width: Int,
+        height: Int,
+        insetRatio: Float = 0.15f,
+    ): Float {
+        val m = maxOf(1, Math.round(minOf(width, height) * insetRatio))
+        val x0 = if (width > 2 * m + 2) m else 0
+        val x1 = if (width > 2 * m + 2) width - m else width
+        val y0 = if (height > 2 * m + 2) m else 0
+        val y1 = if (height > 2 * m + 2) height - m else height
+        val w = x1 - x0
+        val h = y1 - y0
+        if (w < 3 || h < 3) return 0f
         var sum = 0.0
         var sumSq = 0.0
-        val n = width * height
-        for (y in 0 until height) {
+        val n = w * h
+        for (y in 0 until h) {
             val up = if (y == 0) 0 else y - 1
-            val down = if (y == height - 1) y else y + 1
-            for (x in 0 until width) {
+            val down = if (y == h - 1) y else y + 1
+            for (x in 0 until w) {
                 val left = if (x == 0) 0 else x - 1
-                val right = if (x == width - 1) x else x + 1
-                val lap = (gray[up * width + x] + gray[down * width + x] +
-                    gray[y * width + left] + gray[y * width + right] -
-                    4.0 * gray[y * width + x]).toDouble()
+                val right = if (x == w - 1) x else x + 1
+                fun at(dx: Int, dy: Int) = gray[(y0 + dy) * width + (x0 + dx)]
+                val centre = at(x, y)
+                val lap = (at(x, up) + at(x, down) + at(left, y) + at(right, y) -
+                    4.0 * centre).toDouble()
                 sum += lap
                 sumSq += lap * lap
             }

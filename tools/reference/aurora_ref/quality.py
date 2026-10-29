@@ -33,12 +33,21 @@ def to_gray_float(rgb: np.ndarray) -> np.ndarray:
             + 0.114 * rgb[..., 2].astype(np.float64))
 
 
-def laplacian_variance(gray: np.ndarray) -> float:
+def laplacian_variance(gray: np.ndarray, inset_ratio: float = 0.15) -> float:
     """Variance of the 4-neighbour Laplacian (classic blur detector).
 
-    Border pixels use replication so the result does not depend on padding mode.
+    A border of ``inset_ratio`` of the short side is excluded: the aligned crop
+    is produced by a warp with zero padding, so when a face sits at the edge of
+    the source photo the outer pixels contain an artificial black frame. That
+    frame has a huge Laplacian response and would make a *blurrier* image look
+    sharper (measured: blurred faces with clipped alignment scored 200-440
+    instead of ~5). Border pixels inside the inset use replication.
     """
-    g = gray
+    m = max(1, int(round(min(gray.shape) * inset_ratio)))
+    if gray.shape[0] <= 2 * m + 2 or gray.shape[1] <= 2 * m + 2:
+        g = gray
+    else:
+        g = gray[m:gray.shape[0] - m, m:gray.shape[1] - m]
     h, w = g.shape
     if h < 3 or w < 3:
         return 0.0

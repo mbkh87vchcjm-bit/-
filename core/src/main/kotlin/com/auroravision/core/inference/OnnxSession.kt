@@ -36,19 +36,23 @@ class OnnxSession private constructor(
             val env = OrtEnvironment.getEnvironment()
             OnnxTensor.createTensor(env, FloatBuffer.wrap(input), shape).use { tensor ->
                 session.run(mapOf(inputName to tensor)).use { result ->
+                    // Iterate the result instead of index-based lookups: this keeps
+                    // the code independent of Optional-handling differences across
+                    // ONNX Runtime releases.
+                    val byName = HashMap<String, OnnxTensor>(outputNames.size)
+                    for (entry in result) {
+                        val value = entry.value
+                        if (value is OnnxTensor) byName[entry.key] = value
+                    }
                     val out = ArrayList<TensorOutput>(outputNames.size)
                     for (name in outputNames) {
-                        val value = result.get(name).orElseThrow {
-                            IllegalStateException("model produced no output named '$name'")
-                        }
-                        val t = value as OnnxTensor
-                        val dims = t.info.shape.clone()
-                        val buffer = t.floatBuffer.orElseThrow {
-                            IllegalStateException("output '$name' is not a float tensor")
-                        }
+                        val t = byName[name]
+                            ?: throw IllegalStateException("model produced no tensor output named '$name'")
+                        val buffer = t.floatBuffer.orElse(null)
+                            ?: throw IllegalStateException("output '$name' is not a float tensor")
                         val arr = FloatArray(buffer.remaining())
                         buffer.get(arr)
-                        out.add(TensorOutput(name, dims, arr))
+                        out.add(TensorOutput(name, t.info.shape.clone(), arr))
                     }
                     return out
                 }
@@ -80,13 +84,11 @@ class OnnxSession private constructor(
                 opts.setExecutionMode(OrtSession.SessionOptions.ExecutionMode.SEQUENTIAL)
             }
             val session = env.createSession(modelBytes, opts)
-            val input = session.inputNames.first()
-            val shape = session.inputInfo[input]?.info as? ai.onnxruntime.TensorInfo
             return OnnxSession(
                 session = session,
-                inputName = input,
+                inputName = session.inputNames.first(),
                 outputNames = session.outputNames.toList(),
-                inputShape = shape?.shape ?: LongArray(0),
+                inputShape = LongArray(0),
             )
         }
     }

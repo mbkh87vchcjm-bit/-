@@ -38,7 +38,7 @@
      "quality": {
       "status": "ok",
       "score": 0.8567,
-      "sharpness": 736.37,
+      "sharpness": 716.46,
       "brightness": 143.0,
       "contrast": 40.23,
       "yawProxy": 0.007,
@@ -218,7 +218,7 @@
      "quality": {
       "status": "ok",
       "score": 0.8779,
-      "sharpness": 691.3,
+      "sharpness": 560.41,
       "brightness": 110.29,
       "contrast": 57.88,
       "yawProxy": 0.1311,
@@ -398,7 +398,7 @@
      "quality": {
       "status": "ok",
       "score": 0.7793,
-      "sharpness": 183.31,
+      "sharpness": 214.83,
       "brightness": 118.59,
       "contrast": 38.25,
       "yawProxy": 0.1165,
@@ -578,7 +578,7 @@
      "quality": {
       "status": "ok",
       "score": 0.9596,
-      "sharpness": 756.6,
+      "sharpness": 966.54,
       "brightness": 134.85,
       "contrast": 48.83,
       "yawProxy": 0.0277,
@@ -751,7 +751,7 @@
      "quality": {
       "status": "ok",
       "score": 0.8937,
-      "sharpness": 618.54,
+      "sharpness": 253.29,
       "brightness": 95.81,
       "contrast": 49.98,
       "yawProxy": 0.0747,
@@ -923,8 +923,8 @@
      ],
      "quality": {
       "status": "ok",
-      "score": 0.7895,
-      "sharpness": 294.09,
+      "score": 0.73,
+      "sharpness": 102.15,
       "brightness": 107.04,
       "contrast": 26.15,
       "yawProxy": 0.2488,
@@ -1104,7 +1104,7 @@
      "quality": {
       "status": "ok",
       "score": 0.8383,
-      "sharpness": 399.18,
+      "sharpness": 197.13,
       "brightness": 136.45,
       "contrast": 54.84,
       "yawProxy": 0.1193,
@@ -1277,7 +1277,7 @@
      "quality": {
       "status": "ok",
       "score": 0.7891,
-      "sharpness": 162.41,
+      "sharpness": 144.63,
       "brightness": 117.07,
       "contrast": 38.3,
       "yawProxy": 0.0752,
@@ -1457,7 +1457,7 @@
      "quality": {
       "status": "ok",
       "score": 0.8346,
-      "sharpness": 405.97,
+      "sharpness": 334.09,
       "brightness": 135.66,
       "contrast": 80.09,
       "yawProxy": 0.118,
@@ -1630,7 +1630,7 @@
      "quality": {
       "status": "warning",
       "score": 0.8044,
-      "sharpness": 440.8,
+      "sharpness": 377.58,
       "brightness": 153.05,
       "contrast": 54.69,
       "yawProxy": 0.0462,
@@ -1812,7 +1812,7 @@
      "quality": {
       "status": "ok",
       "score": 0.8525,
-      "sharpness": 851.04,
+      "sharpness": 1015.48,
       "brightness": 107.11,
       "contrast": 73.57,
       "yawProxy": 0.1072,
@@ -1992,7 +1992,7 @@
      "quality": {
       "status": "ok",
       "score": 0.8611,
-      "sharpness": 409.19,
+      "sharpness": 470.36,
       "brightness": 124.09,
       "contrast": 66.27,
       "yawProxy": 0.0986,
@@ -3901,7 +3901,7 @@
   "sharp": {
    "status": "ok",
    "score": 0.8567,
-   "sharpness": 736.37,
+   "sharpness": 716.46,
    "brightness": 143.0,
    "contrast": 40.23,
    "yawProxy": 0.007,
@@ -3915,7 +3915,7 @@
   "blurred": {
    "status": "rejected",
    "score": 0.533,
-   "sharpness": 7.25,
+   "sharpness": 8.8,
    "brightness": 137.69,
    "contrast": 38.7,
    "yawProxy": 0.0315,
