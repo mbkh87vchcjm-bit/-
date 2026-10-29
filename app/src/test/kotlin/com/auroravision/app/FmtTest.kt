@@ -26,7 +26,9 @@ class FmtTest {
     @Test
     fun `candidate explanation states that similarity is not identity`() {
         val text = Fmt.verdictExplanation("CANDIDATES_FOUND", 0.3265f)
-        assertTrue(text.contains("ليست"))
+        // "…تشابهًا بصريًا يستحق المراجعة، وليس تأكيدًا لهوية الشخص"
+        assertTrue("must deny that the score confirms an identity: $text", text.contains("ليس"))
+        assertTrue(text.contains("تأكيد"))
         assertTrue(text.contains("0.3265"))
     }
 
