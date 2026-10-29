@@ -201,6 +201,21 @@ fun AnalyzeScreen(
                         }
                     }
 
+                    if (state.faces.any { it.quality.status != QualityStatus.REJECTED } && !state.running) {
+                        Spacer(Modifier.height(10.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            HudLabel("عدد النتائج:")
+                            listOf(3, 5, 10, 20).forEach { k ->
+                                Spacer(Modifier.width(6.dp))
+                                TopKChip(
+                                    value = k,
+                                    selected = state.topK == k,
+                                    onClick = { viewModel.setTopK(k) },
+                                )
+                            }
+                        }
+                    }
+
                     if (state.matches.isNotEmpty()) {
                         Spacer(Modifier.height(14.dp))
                         HudLabel("أفضل النتائج (${state.matches.size})")
@@ -336,6 +351,21 @@ private fun MetricPill(label: String, value: String) {
         Text(value, style = MaterialTheme.typography.bodyMedium, color = AuroraColors.TextPrimary)
         HudLabel(label)
     }
+}
+
+@Composable
+private fun TopKChip(value: Int, selected: Boolean, onClick: () -> Unit) {
+    val color = if (selected) AuroraColors.Cyan else AuroraColors.TextSecondary
+    Text(
+        text = value.toString(),
+        style = MaterialTheme.typography.bodySmall,
+        color = color,
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (selected) AuroraColors.PanelLight else AuroraColors.Panel)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 4.dp),
+    )
 }
 
 @Composable

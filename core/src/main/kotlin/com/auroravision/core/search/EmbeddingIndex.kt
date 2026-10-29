@@ -33,6 +33,9 @@ class EmbeddingIndex private constructor(
 ) {
     val dimension: Int get() = if (count == 0) FaceEmbedding.DIMENSION else matrix.size / count
 
+    /** Records that can take part in a comparison (quality-rejected ones cannot). */
+    val comparableCount: Int get() = comparable.count { it }
+
     fun recordIdAt(i: Int): Long = ids[i]
 
     fun isComparable(i: Int): Boolean = comparable[i]

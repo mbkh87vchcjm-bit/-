@@ -79,6 +79,8 @@ data class AnalyzeUiState(
     val sessionId: Long? = null,
     val error: String? = null,
     val referenceCount: Int = 0,
+    /** How many ranked results the user asked for (3..20). */
+    val topK: Int = 5,
 ) {
     val selectedFace: FaceUi? get() = faces.firstOrNull { it.index == selectedFaceIndex }
     val qualityStatus: QualityStatus get() = selectedFace?.quality?.status ?: QualityStatus.OK
@@ -247,8 +249,16 @@ class AnalyzeViewModel(
         )
     }
 
+    /** Changes how many results are returned and re-runs only the search. */
+    fun setTopK(topK: Int) {
+        val clamped = topK.coerceIn(3, container.matchPolicy.maxTopK)
+        val faceIndex = _state.value.selectedFaceIndex
+        _state.value = _state.value.copy(topK = clamped)
+        if (faceIndex != null) selectFace(faceIndex, clamped)
+    }
+
     /** Re-runs only the search for a different face of the same image. */
-    fun selectFace(faceIndex: Int, topK: Int = container.matchPolicy.defaultTopK) {
+    fun selectFace(faceIndex: Int, topK: Int = _state.value.topK) {
         if (_state.value.running) return
         val observation = observations.firstOrNull { it.detection.index == faceIndex } ?: return
         val embedding: FaceEmbedding = observation.embedding ?: run {

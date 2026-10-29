@@ -83,6 +83,26 @@ class SearchServiceTest {
     }
 
     @Test
+    fun `a prebuilt index reports real counts instead of zero`() {
+        // Regression: the app always searches through a cached index, so counts
+        // taken from the (empty) corpus argument made a full database look empty.
+        val query = vector(1f, 0f, 0f)
+        val faces = listOf(
+            indexed(1, vector(1f, 0f, 0f)),
+            indexed(2, vector(0.5f, 0.8f, 0f)),
+            IndexedFace(3, vector(0.2f, 0.9f, 0f), modelKey, qualityComparable = false),
+        )
+        val index = EmbeddingIndex.build(modelKey, faces)
+        val out = service.search(query, corpus = emptyList(), modelKey = modelKey, topK = 5, index = index)
+        assertEquals(2, out.comparedCount)
+        assertEquals(1, out.skippedQualityRejected)
+        assertEquals(3, out.totalRegistered)
+        assertEquals(MatchVerdict.CANDIDATES_FOUND, out.verdict)
+        assertEquals(2, out.hits.size)
+        assertTrue("quality-rejected record must not be returned", out.hits.none { it.recordId == 3L })
+    }
+
+    @Test
     fun `empty corpus yields NO_REFERENCE_DATA`() {
         val out = service.search(vector(1f), emptyList(), modelKey, topK = 5)
         assertEquals(MatchVerdict.NO_REFERENCE_DATA, out.verdict)

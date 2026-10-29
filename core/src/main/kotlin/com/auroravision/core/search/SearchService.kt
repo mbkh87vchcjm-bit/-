@@ -34,16 +34,30 @@ class SearchService(private val policy: MatchPolicy) {
         topK: Int = policy.defaultTopK,
         index: EmbeddingIndex? = null,
     ): SearchOutcome {
-        val eligible = if (index != null && index.modelKey == modelKey) {
-            null // already filtered by the caller
-        } else {
-            corpus.filter { it.modelKey == modelKey }
-        }
-        val skippedModel = corpus.size - (eligible?.size ?: corpus.size)
-        val skippedQuality = (eligible ?: corpus).count { !it.qualityComparable }
-        val comparableCount = (eligible ?: corpus).count { it.qualityComparable }
+        val idx: EmbeddingIndex
+        val skippedModel: Int
+        val skippedQuality: Int
+        val comparableCount: Int
+        val totalRegistered: Int
 
-        val idx = index ?: EmbeddingIndex.build(modelKey, eligible ?: corpus)
+        if (index != null && index.modelKey == modelKey) {
+            // Pre-built (cached) index: its entries are already filtered by model
+            // key, so the counts must be read from the index itself — reporting 0
+            // here would make a non-empty database look empty.
+            idx = index
+            skippedModel = 0
+            skippedQuality = index.count - index.comparableCount
+            comparableCount = index.comparableCount
+            totalRegistered = index.count
+        } else {
+            val eligible = corpus.filter { it.modelKey == modelKey }
+            skippedModel = corpus.size - eligible.size
+            skippedQuality = eligible.count { !it.qualityComparable }
+            comparableCount = eligible.count { it.qualityComparable }
+            totalRegistered = corpus.size
+            idx = EmbeddingIndex.build(modelKey, eligible)
+        }
+
         val effectiveTopK = topK.coerceIn(1, maxOf(1, minOf(policy.maxTopK, comparableCount.coerceAtLeast(1))))
 
         var hits: List<RankedMatch> = emptyList()
@@ -71,7 +85,7 @@ class SearchService(private val policy: MatchPolicy) {
             comparedCount = comparableCount,
             skippedModelMismatch = skippedModel,
             skippedQualityRejected = skippedQuality,
-            totalRegistered = corpus.size,
+            totalRegistered = totalRegistered,
             hits = hits,
             bestSimilarity = best,
             verdict = verdict,
