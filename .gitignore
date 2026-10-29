@@ -1,0 +1,22 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+*.apk
+*.aab
+/app/release/
+/app/debug/
+/out/
+!gradle/wrapper/gradle-wrapper.jar
+# Reference-pipeline virtualenv / caches
+/tools/reference/.venv/
+__pycache__/
+*.pyc
+# Generated evaluation artefacts that are large (reports are committed, raw dumps are not)
+/tools/reference/out/embeddings_cache/
