@@ -181,13 +181,21 @@ object ImageOps {
         return RgbImage(w, h, out)
     }
 
-    /** Rotates the image by [degrees] around its centre (used by tests/robustness). */
+    /**
+     * Rotates the image by [degrees] around its centre.
+     *
+     * The centre is `(w/2, h/2)` in *continuous* coordinates — the same
+     * convention [warpAffine] uses (pixel centres at half-integers). Using the
+     * integer pixel centre here instead shifts the result by half a pixel and
+     * pushes the corner pixels out of bounds (measured before the fix: a
+     * 90°+(-90°) round trip drifted by 254 grey levels).
+     */
     fun rotate(src: RgbImage, degrees: Float): RgbImage {
         val rad = Math.toRadians(degrees.toDouble())
         val c = kotlin.math.cos(rad).toFloat()
         val s = kotlin.math.sin(rad).toFloat()
-        val cx = (src.width - 1) / 2f
-        val cy = (src.height - 1) / 2f
+        val cx = src.width / 2f
+        val cy = src.height / 2f
         // rotate around the centre: dst = R * (src - c) + c
         val m = Affine2x3(
             a = c, b = -s, c = cx - c * cx + s * cy,
