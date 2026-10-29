@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -136,14 +137,7 @@ fun CameraScreen(
                 },
             )
             Spacer(Modifier.height(8.dp))
-            Text(
-                "رجوع",
-                style = MaterialTheme.typography.bodySmall,
-                color = AuroraColors.TextSecondary,
-                modifier = Modifier.padding(8.dp),
-                // clickable via the parent row in the nav host
-            )
-            androidx.compose.material3.TextButton(onClick = onBack) { Text("إلغاء") }
+            TextButton(onClick = onBack) { Text("إلغاء", color = AuroraColors.TextSecondary) }
         }
     }
 }

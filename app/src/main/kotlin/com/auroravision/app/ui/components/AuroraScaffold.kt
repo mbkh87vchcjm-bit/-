@@ -82,12 +82,6 @@ fun AuroraPanel(
                 ),
                 shape = RoundedCornerShape(18.dp),
             )
-            .then(
-                Modifier.background(
-                    color = Color.Transparent,
-                    shape = RoundedCornerShape(18.dp),
-                ),
-            ),
     ) {
         Canvas(Modifier.fillMaxSize()) {
             drawRoundRect(
